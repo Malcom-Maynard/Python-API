@@ -5,6 +5,7 @@ from db.models.user import User
 
 class Post(db.Model):
     __tablename__ = "post"
+
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String, nullable=False)
     likes = db.Column(db.Integer, default=0, nullable=False)
