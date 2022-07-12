@@ -1,6 +1,7 @@
 from ast import Return
 from cgitb import text
 from hashlib import new
+from typing import List
 from xml.dom.minidom import TypeInfo
 from flask import jsonify, request, g, abort
 from sqlalchemy import false
@@ -15,6 +16,24 @@ from db.utils import row_to_dict
 from middlewares import auth_required
 import jwt
 import os
+
+
+def authorid_validator_list(authorIds):
+    if type(authorIds) != list:
+        return False
+    for id in authorIds:
+        if type(id) != int:
+            return False
+    return True
+
+
+def tags_validator_list(tags):
+    if type(tags) != list:
+        return False
+    for tag in tags:
+        if type(tag) != str:
+            return False
+    return True
 
 
 def authorid_validator(authorIds):
@@ -227,20 +246,46 @@ def patch(postid):
         return abort(401)
 
     # gartering data from request
-    data = request.get_json()
+    try:
+        data = request.get_json()
+    except:
+        jsonify({"error": "No valid data given"}), 401,
 
     try:
         authorIds = data["authorIds"]
+        if authorid_validator_list(authorIds) == False:
+            return (
+                jsonify(
+                    {"error": "unsupported format of authorIds, list of ints expected"}
+                ),
+                412,
+            )
+
     except:
         authorIds = None
 
     try:
         tags = data["tags"]
+        if tags_validator_list(tags) == False:
+            return (
+                jsonify(
+                    {"error": "unsupported format of tags, list of strings expected"}
+                ),
+                412,
+            )
+
     except:
         tags = None
 
     try:
         text = data["text"]
+
+        if type(text) != str:
+            return (
+                jsonify({"error": "unsupported format of text, String expected"}),
+                412,
+            )
+
     except:
         text = None
 
@@ -285,6 +330,6 @@ def patch(postid):
                 "text": updatedPost.text,
                 "tags": updatedPost.tags,
             }
-
+            print(result)
             return jsonify({"post": result}), 200
     return jsonify({"error": "You have not created any post by that ID"}), 400

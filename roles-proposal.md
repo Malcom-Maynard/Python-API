@@ -5,6 +5,8 @@ o first add new table to hold these different custom roles
 o each tables will hold the author id's and columns for each one permissions that is required
 o permissions can be easily changed by updating the values inside of the table based on the users requirements 
 
+o another solution would be to use SQL role command to update and add   
+
 ?Possible user SQL Create Role
 2.
 o the patch operation would need further code for authorization
